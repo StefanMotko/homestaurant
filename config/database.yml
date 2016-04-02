@@ -80,6 +80,6 @@ test:
 #
 production:
   <<: *default
-  database: Homestaurant_production
-  username: Homestaurant
-  password: <%= ENV['HOMESTAURANT_DATABASE_PASSWORD'] %>
+  database: ddccd2og37nve2
+  username: tsjxbzbzmhomxz
+  password: 4quunUP9cTxWZshgZmpEWcdv0N
