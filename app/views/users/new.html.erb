@@ -1,0 +1,25 @@
+<!--<form action="create" method="POST">-->
+
+  <!--Username:<br>-->
+  <!--<input type="text" name="username" value=""><br>-->
+  <!--E-mail:<br>-->
+  <!--<input type="email" name="email" value=""><br>-->
+  <!--Password:<br>-->
+  <!--<input type="password" name="password" value=""><br>-->
+  <!--<input type="submit" value="Submit">-->
+
+<!--</form>-->
+
+<%= form_for @user do |f| %>
+
+    <%= f.label :username %>
+    <%= f.text_field :username %><br>
+
+    <%= f.label :email %>
+    <%= f.email_field :email %><br>
+
+    <%= f.label :password %>
+    <%= f.password_field :password %><br>
+
+    <%= f.submit %>
+<% end %>
