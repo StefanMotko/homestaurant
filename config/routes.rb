@@ -1,5 +1,11 @@
 Rails.application.routes.draw do
 
+  get 'recipes/my_recipes'
+
+  get 'recipes/favorites'
+
+  get 'recipes/browse'
+
   get '/about' => 'static_pages#about'
 
   get 'users/new'
