@@ -8,13 +8,18 @@
 </head>
 <body>
 
-<nav>
-  <%= link_to 'Home',   '/' %>
-  <%= link_to 'Sign up',   '/users/new' %>
-  <%= link_to 'About',   '/about' %>
-</nav>
+<div class="col-xs-1 bg-success">
+  <nav>
+    <div class="row text-center"><%= link_to 'Home',   '/' %></div>
+    <div class="row text-center"><%= link_to 'Sign up',   '/users/new' %></div>
+    <div class="row text-center"><%= link_to 'About',   '/about' %></div>
+  </nav>
 
-<%= yield %>
+</div>
+
+<div class="col-xs-11">
+  <%= yield %>
+</div>
 
 </body>
 </html>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160404185601) do
+ActiveRecord::Schema.define(version: 20160404200638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -20,24 +20,44 @@ ActiveRecord::Schema.define(version: 20160404185601) do
     t.text     "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "user_id"
+    t.integer  "recipe_id"
   end
 
+  add_index "comments", ["recipe_id"], name: "index_comments_on_recipe_id", using: :btree
+  add_index "comments", ["user_id"], name: "index_comments_on_user_id", using: :btree
+
   create_table "components", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "ingredient_id"
+    t.integer  "recipe_id"
   end
+
+  add_index "components", ["ingredient_id"], name: "index_components_on_ingredient_id", using: :btree
+  add_index "components", ["recipe_id"], name: "index_components_on_recipe_id", using: :btree
 
   create_table "favorites_memberships", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "user_id"
+    t.integer  "recipe_id"
   end
+
+  add_index "favorites_memberships", ["recipe_id"], name: "index_favorites_memberships_on_recipe_id", using: :btree
+  add_index "favorites_memberships", ["user_id"], name: "index_favorites_memberships_on_user_id", using: :btree
 
   create_table "ingredient_ratings", force: :cascade do |t|
     t.integer  "rating"
     t.datetime "expiration"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.integer  "user_id"
+    t.integer  "ingredient_id"
   end
+
+  add_index "ingredient_ratings", ["ingredient_id"], name: "index_ingredient_ratings_on_ingredient_id", using: :btree
+  add_index "ingredient_ratings", ["user_id"], name: "index_ingredient_ratings_on_user_id", using: :btree
 
   create_table "ingredients", force: :cascade do |t|
     t.string   "name"
@@ -48,7 +68,12 @@ ActiveRecord::Schema.define(version: 20160404185601) do
   create_table "my_recipes_memberships", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "user_id"
+    t.integer  "recipe_id"
   end
+
+  add_index "my_recipes_memberships", ["recipe_id"], name: "index_my_recipes_memberships_on_recipe_id", using: :btree
+  add_index "my_recipes_memberships", ["user_id"], name: "index_my_recipes_memberships_on_user_id", using: :btree
 
   create_table "recipe_ratings", force: :cascade do |t|
     t.integer  "quality"
@@ -56,7 +81,12 @@ ActiveRecord::Schema.define(version: 20160404185601) do
     t.integer  "time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "user_id"
+    t.integer  "recipe_id"
   end
+
+  add_index "recipe_ratings", ["recipe_id"], name: "index_recipe_ratings_on_recipe_id", using: :btree
+  add_index "recipe_ratings", ["user_id"], name: "index_recipe_ratings_on_user_id", using: :btree
 
   create_table "recipes", force: :cascade do |t|
     t.string   "name"
@@ -76,5 +106,17 @@ ActiveRecord::Schema.define(version: 20160404185601) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "comments", "recipes"
+  add_foreign_key "comments", "users"
+  add_foreign_key "components", "ingredients"
+  add_foreign_key "components", "recipes"
+  add_foreign_key "favorites_memberships", "recipes"
+  add_foreign_key "favorites_memberships", "users"
+  add_foreign_key "ingredient_ratings", "ingredients"
+  add_foreign_key "ingredient_ratings", "users"
+  add_foreign_key "my_recipes_memberships", "recipes"
+  add_foreign_key "my_recipes_memberships", "users"
+  add_foreign_key "recipe_ratings", "recipes"
+  add_foreign_key "recipe_ratings", "users"
   add_foreign_key "recipes", "users"
 end

@@ -1,25 +1,48 @@
-<!--<form action="create" method="POST">-->
-
-  <!--Username:<br>-->
-  <!--<input type="text" name="username" value=""><br>-->
-  <!--E-mail:<br>-->
-  <!--<input type="email" name="email" value=""><br>-->
-  <!--Password:<br>-->
-  <!--<input type="password" name="password" value=""><br>-->
-  <!--<input type="submit" value="Submit">-->
-
-<!--</form>-->
-
 <%= form_for @user do |f| %>
 
-    <%= f.label :username %>
-    <%= f.text_field :username %><br>
+    <div class="row">
+      <div class='col-xs-2'>
+        <%= f.label :username %>
+      </div>
+      <div class='col-xs-2 text-center'>
+        <%= f.text_field :username %>
+      </div>
+    </div>
 
-    <%= f.label :email %>
-    <%= f.email_field :email %><br>
 
-    <%= f.label :password %>
-    <%= f.password_field :password %><br>
+    <div class="row">
+      <div class='col-xs-2'>
+        <%= f.label :email %>
+      </div>
+      <div class='col-xs-2 text-center'>
+        <%= f.email_field :email %>
+      </div>
+    </div>
 
-    <%= f.submit %>
+
+    <div class="row">
+      <div class='col-xs-2'>
+        <%= f.label :password %>
+      </div>
+      <div class='col-xs-2 text-center'>
+        <%= f.password_field :password %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class='col-xs-2'>
+        <%= f.label :confirm_password %>
+      </div>
+      <div class='col-xs-2 text-center'>
+        <%= f.password_field :confirm_password %>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class='col-xs-2'></div>
+      <div class="col-xs-2">
+        <%= f.submit class: 'btn btn-primary center-block' %>
+      </div>
+    </div>
+
 <% end %>
