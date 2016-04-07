@@ -8,8 +8,6 @@ Rails.application.routes.draw do
 
   get '/about' => 'static_pages#about'
 
-  get 'users/new'
-
   root 'static_pages#home'
 
   resources :users

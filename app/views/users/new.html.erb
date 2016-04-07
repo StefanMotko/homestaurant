@@ -1,47 +1,49 @@
 <%= form_for @user do |f| %>
 
-    <div class="row">
-      <div class='col-xs-2'>
-        <%= f.label :username %>
+    <div class="signup-panel">
+      <div class="row signup-panel-row">
+        <div class='col-xs-2'>
+          <%= f.label :username %>
+        </div>
+        <div class='col-xs-2 text-center'>
+          <%= f.text_field :username %>
+        </div>
       </div>
-      <div class='col-xs-2 text-center'>
-        <%= f.text_field :username %>
-      </div>
-    </div>
 
 
-    <div class="row">
-      <div class='col-xs-2'>
-        <%= f.label :email %>
+      <div class="row signup-panel-row">
+        <div class='col-xs-2'>
+          <%= f.label :email %>
+        </div>
+        <div class='col-xs-2 text-center'>
+          <%= f.email_field :email %>
+        </div>
       </div>
-      <div class='col-xs-2 text-center'>
-        <%= f.email_field :email %>
-      </div>
-    </div>
 
 
-    <div class="row">
-      <div class='col-xs-2'>
-        <%= f.label :password %>
+      <div class="row signup-panel-row">
+        <div class='col-xs-2'>
+          <%= f.label :password %>
+        </div>
+        <div class='col-xs-2 text-center'>
+          <%= f.password_field :password %>
+        </div>
       </div>
-      <div class='col-xs-2 text-center'>
-        <%= f.password_field :password %>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class='col-xs-2'>
-        <%= f.label :password_confirmation %>
+      <div class="row signup-panel-row">
+        <div class='col-xs-2'>
+          <%= f.label :password_confirmation %>
+        </div>
+        <div class='col-xs-2 text-center'>
+          <%= f.password_field :password_confirmation %>
+        </div>
       </div>
-      <div class='col-xs-2 text-center'>
-        <%= f.password_field :password_confirmation %>
-      </div>
-    </div>
 
-    <div class="row">
-      <div class='col-xs-2'></div>
-      <div class="col-xs-2">
-        <%= f.submit class: 'btn btn-primary center-block' %>
+      <div class="row signup-panel-row">
+        <div class='col-xs-2'></div>
+        <div class="col-xs-2">
+          <%= f.submit class: 'btn btn-primary center-block' %>
+        </div>
       </div>
     </div>
 
