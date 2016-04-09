@@ -1,12 +1,14 @@
 Rails.application.routes.draw do
 
+  get '/login' => 'sessions#new'
+  post '/login' => 'sessions#create'
+  delete '/logout' => 'sessions#destroy'
+
   get 'recipes/my_recipes'
-
   get 'recipes/favorites'
-
   get 'recipes/browse'
 
-  get '/about' => 'static_pages#about'
+  get 'about' => 'static_pages#about'
 
   root 'static_pages#home'
 

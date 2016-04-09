@@ -3,7 +3,7 @@
     <div class="signup-panel">
       <div class="row signup-panel-row">
         <div class='col-xs-2'>
-          <%= f.label :username %>
+          <%= f.label :username, 'User name' %>
         </div>
         <div class='col-xs-2 text-center'>
           <%= f.text_field :username %>
@@ -13,7 +13,7 @@
 
       <div class="row signup-panel-row">
         <div class='col-xs-2'>
-          <%= f.label :email %>
+          <%= f.label :email, 'E-mail address' %>
         </div>
         <div class='col-xs-2 text-center'>
           <%= f.email_field :email %>
@@ -32,7 +32,7 @@
 
       <div class="row signup-panel-row">
         <div class='col-xs-2'>
-          <%= f.label :password_confirmation %>
+          <%= f.label :password_confirmation, 'Retype password' %>
         </div>
         <div class='col-xs-2 text-center'>
           <%= f.password_field :password_confirmation %>

@@ -5,15 +5,19 @@ class UsersController < ApplicationController
   end
 
   def create
-    extparams = params[:user]
 
-    if extparams[:password] != extparams[:password_confirmation]
+    extparams = params.require(:user).permit(:username,:email,:password,:password_confirmation)
+    @user = User.new(extparams)
+
+
+    if @user.invalid?
       render 'new'
+      return
     end
 
-    execute_sql "INSERT INTO users (username, email, password, created_at, updated_at)
-                VALUES ('#{extparams[:username]}','#{extparams[:email]}','#{extparams[:password]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
-    render nothing: true
+    execute_sql "INSERT INTO users (username, email, password_digest, created_at, updated_at)
+                VALUES ('#{@user.username}','#{@user.email}','#{@user.password_digest}',timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+    render 'sessions/new'
   end
 
 end
