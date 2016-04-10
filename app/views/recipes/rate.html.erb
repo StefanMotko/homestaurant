@@ -1,0 +1,49 @@
+<div class="row">
+
+  <div class="col-md-2">
+    <label>Recipe name:</label>
+  </div>
+
+  <div class="col-md-10">
+    <%= @recipe[:name] %>
+  </div>
+
+</div>
+
+<div class="row">
+
+  <div class="col-md-2">
+    <label>Textual guide:</label>
+  </div>
+
+  <div class="col-md-10">
+    <%= @recipe[:guide] %>
+  </div>
+
+</div>
+
+<%= form_for :rating, url: "/recipes/#{@recipe[:id]}/rate" do |f| %>
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-6"><%= f.label :quality %></div>
+
+        <div class="col-md-6"><%= f.number_field :quality, min: 0, max: 10 %></div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-6"><%= f.label :difficulty %></div>
+
+        <div class="col-md-6"><%= f.number_field :difficulty, min: 0, max: 10 %></div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-6"><%= f.label :time, 'Preparation time' %></div>
+
+        <div class="col-md-6"><%= f.number_field :time, min: 0, max: 10 %></div>
+
+      </div>
+      <div class="row"><%= f.submit 'Rate', class: 'btn btn-primary' %></div>
+    </div>
+
+
+<% end %>

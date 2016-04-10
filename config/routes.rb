@@ -8,15 +8,19 @@ Rails.application.routes.draw do
   get 'recipes/my_recipes'
   get 'recipes/favorites'
   get 'recipes/browse'
+  get 'recipes/new'
+  get 'recipes/:id/rate' => 'recipes#rate'
+  post 'recipes/:id/rate' => 'recipes#createrating'
+  post 'recipes/create'
+  get 'users/edit'
+  post 'users/modify'
+  delete 'recipes/:id/destroy' => 'recipes#destroy'
 
   get 'about' => 'static_pages#about'
 
   root 'static_pages#home'
 
-  resources :recipes do
-
-  end
-
+  resources :recipes
   resources :users do
     get 'new'
     post 'create'

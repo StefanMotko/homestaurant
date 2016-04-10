@@ -1,15 +1,49 @@
-<%= form_for @recipe do |r| %>
+<%= form_for :recipe, url: recipes_create_path do |f| %>
 
-    <div class="row">
-      <%= r.label :name, 'Recipe name' %>
-      <%= r.text_field :name %>
+    <h1>New recipe</h1>
+
+    <div class="margin-panel">
+      <div class="col-md-4">
+        <div class="row">
+
+          <div class="col-md-3">
+            <%= f.label :name, 'Recipe name' %>
+          </div>
+
+          <div class="col-md-9">
+            <%= f.text_field :name %>
+          </div>
+
+        </div>
+
+        <div class="row" style="margin-top:4px">
+
+          <div class="col-md-3">
+            <%= f.label :guide, 'Text guide'%>
+          </div>
+
+          <div class="col-md-9">
+            <%= f.text_area :guide, style:'min-height: 240px;min-width:300px;' %>
+          </div>
+
+        </div>
+
+        <%= f.submit 'Add Recipe' , class: 'btn btn-default' %>
+      </div>
+
+      <div class="col-md-8">
+        <div class="row" id="ingredientSelect">
+          <%= f.label :ingredient1, 'Ingredient 1' %>
+          <%= f.select :ingredient1, @ingredientlist %>
+          <%= f.text_field :ingredient1_details, placeholder: 'Additional details' %>
+          <%= f.text_field :ingredient1_amount, placeholder: 'Specify amount' %>
+
+        </div>
+
+        <div class="row" id="ingredientAddButtonRow">
+          <button type="button" id="ingredientAddButton" class="btn btn-default">Add another ingredient</button>
+        </div>
+      </div>
     </div>
-
-    <div class="row">
-      <%= r.label :guide, 'Textual guide' %>
-      <%= r.text_area :guide %>
-    </div>
-
-    <%= r.submit 'Add Recipe' %>
 
 <% end %>

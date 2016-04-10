@@ -1,1 +1,13 @@
-<%= render 'partials/thumbnails_view' %>
+<%= form_for :query, url: request.path, method: :get do |f| %>
+
+    <div class="row">
+      <ul class="pagination">
+        <% @pagecount.times do |i| %>
+            <%= render partial: 'partials/paginate_link', locals: {form: f, page: i+1} %>
+        <% end %>
+      </ul>
+    </div>
+
+    <%= render 'partials/thumbnails_view' %>
+
+<% end %>

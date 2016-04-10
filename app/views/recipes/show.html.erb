@@ -1,0 +1,41 @@
+<div class="col-md-6">
+  <div class="row">
+
+    <div class="col-md-2">
+      <label>Recipe name:</label>
+    </div>
+
+    <div class="col-md-10">
+      <%= @recipe[:rname] %>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-2">
+      <label>Textual guide:</label>
+    </div>
+
+    <div class="col-md-10">
+      <%= @recipe[:guide] %>
+    </div>
+
+  </div>
+
+  <div class="row">Quality: <%= @quality %></div>
+  <div class="row">Difficulty: <%= @difficulty %></div>
+  <div class="row">Preparation time: <%= @time %></div>
+
+
+  <div class="row"><%= link_to 'Rate' , "/recipes/#{@recipe[:id]}/rate" %></div>
+  <div class="row"><%= link_to 'Delete' ,"/recipes/#{@recipe[:id]}/destroy", method: :delete if current_user[:id] == @recipe[:user_id] %></div>
+</div>
+<div class="col-md-6">
+
+  <% @ingredientlist.each do |ingredient| %>
+      <%= render partial: 'partials/ingredient', locals: {name: ingredient[:name], details: ingredient[:details], amount: ingredient[:amount]} %>
+  <% end %>
+
+
+</div>

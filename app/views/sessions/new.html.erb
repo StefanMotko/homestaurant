@@ -1,8 +1,8 @@
 <h1>Log in</h1>
 <%= form_for :session, url: login_path do |f| %>
 
-    <div class="signup-panel">
-      <div class="row signup-panel-row">
+    <div class="margin-panel">
+      <div class="row margin-panel-row">
         <div class='col-xs-2'>
           <%= f.label :email, 'E-mail address' %>
         </div>
@@ -12,7 +12,7 @@
       </div>
 
 
-      <div class="row signup-panel-row">
+      <div class="row margin-panel-row">
         <div class='col-xs-2'>
           <%= f.label :password %>
         </div>
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="row signup-panel-row">
+      <div class="row margin-panel-row">
         <div class='col-xs-2'></div>
         <div class="col-xs-2">
           <%= f.submit 'Log in', class: 'btn btn-primary center-block' %>
