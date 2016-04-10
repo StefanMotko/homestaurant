@@ -8,7 +8,7 @@ $(document).ready(function(){
 
         current_ingredients = current_ingredients + 1;
 
-        var modifiedIngredient = clonedIngredient.prop('outerHTML').replace(/1/g,current_ingredients);
+        var modifiedIngredient = clonedIngredient.prop('outerHTML').replace(/ingredient1/g,"ingredient" + current_ingredients);
 
         $("#ingredientAddButtonRow").before(modifiedIngredient);
     })

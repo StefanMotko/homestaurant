@@ -112,6 +112,7 @@ class RecipesController < ApplicationController
     @ingredientlist = {:'Choose ingredient type' => 0}
     all_ingredients.each do |i|
       @ingredientlist[i[:name]] = i[:id]
+      puts i[:id]
     end
 
   end
