@@ -1,0 +1,7 @@
+<div class="row">
+
+  <% slice.each do |item| %>
+    <%= render partial: 'partials/thumbnail', :locals => {content: item, thumbtype: thumbtype} %>
+  <% end %>
+
+</div>

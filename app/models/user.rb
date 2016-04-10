@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   validates :username, length: {minimum: 3, maximum: 40}
   validates :email, length: {maximum: 255}
 
-  validates_uniqueness_of :username
+  validates_uniqueness_of :username, :email
   validates_format_of :email,:with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/
 
   has_secure_password
