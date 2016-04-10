@@ -1,0 +1,1 @@
+jQuery a turbolinks sa nemajú radi, a preto nejde pridava ïalšie ingrediencie v pridavani receptov skor, ne sa stranka reloadne.
