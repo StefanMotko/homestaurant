@@ -55,20 +55,37 @@ class RecipesController < ApplicationController
     end
 
     if params[:query][:text] == ''
-      all_recipes = Recipe.find_by_sql 'SELECT name, id FROM recipes'
+      search = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
+          query: {
+              match_all: {
+              }
+          }
+      }
     else
-      qstring = params[:query][:text]
-      all_recipes = Recipe.find_by_sql ["SELECT DISTINCT r.id, r.name FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON c.ingredient_id = i.id
-                                        WHERE ? @@ r.name OR '#{qstring}' @@ r.guide OR '#{qstring}' @@ i.name OR '#{qstring}' @@ c.details", qstring]
+      search = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
+          query: {
+              query_string: {
+                  query: params[:query][:text]
+              }
+          }
+      }
     end
+
+
 
     page = Integer((params[:commit] ? params[:commit] : '1'))
     rangemin = page * 9 - 9
     rangemax = page * 9 - 1
-    @itemlist = (all_recipes.to_a)[rangemin .. rangemax]
+
+    all_recipes = []
+    (rangemin..rangemax).each do |index|
+      all_recipes.push search['hits']['hits'][index]['_source'] unless search['hits']['hits'][index].nil?
+    end
+
+    @itemlist = (all_recipes)[rangemin .. rangemax]
     @thumbtype = :recipe
     @query = params[:query][:text]
-    @pagecount = all_recipes.to_a.length / 9 + 1
+    @pagecount = all_recipes.length / 9 + 1
   end
 
   # def redis_cache
