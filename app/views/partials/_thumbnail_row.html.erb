@@ -1,7 +1,7 @@
 <div class="row">
 
   <% slice.each do |item| %>
-    <%= render partial: 'partials/thumbnail', :locals => {content: item, thumbtype: thumbtype} %>
+    <%= render partial: 'partials/thumbnail', :locals => {content: item, thumbtype: thumbtype, squaresize: squaresize} %>
   <% end %>
 
 </div>

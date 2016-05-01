@@ -1,5 +1,9 @@
-<div class="thumbnail thumb-item col-md-3">
+<div class="thumbnail thumb-item col-md-<%= ((12-1)/squaresize - 0.5).round %>">
   <%if thumbtype == :recipe %>
   <%= render partial: 'partials/thumbnail_content_recipe', locals: {content: content} %>
+  <% end %>
+
+  <%if thumbtype == :ingredient %>
+      <%= render partial: 'partials/thumbnail_content_ingredient', locals: {content: content} %>
   <% end %>
 </div>

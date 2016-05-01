@@ -9,6 +9,8 @@ Rails.application.routes.draw do
   get 'recipes/favorites'
   get 'recipes/browse'
   get 'recipes/new'
+  get 'recipes/suggest'
+  get 'recipes/getnext'
   get 'recipes/:id/rate' => 'recipes#rate'
   post 'recipes/:id/rate' => 'recipes#createrating'
   post 'recipes/create'

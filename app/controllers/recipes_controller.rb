@@ -44,6 +44,8 @@ class RecipesController < ApplicationController
   end
 
   def browse
+    browse_new
+
     @pagecount = 0
     if params[:query].nil?
       return
@@ -57,8 +59,8 @@ class RecipesController < ApplicationController
       all_recipes = Recipe.find_by_sql 'SELECT name, id FROM recipes'
     else
       qstring = params[:query][:text]
-      all_recipes = Recipe.find_by_sql "SELECT DISTINCT r.id, r.name FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON c.ingredient_id = i.id
-                                        WHERE '#{qstring}' @@ r.name OR '#{qstring}' @@ r.guide OR '#{qstring}' @@ i.name OR '#{qstring}' @@ c.details"
+      all_recipes = Recipe.find_by_sql ["SELECT DISTINCT r.id, r.name FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON c.ingredient_id = i.id
+                                        WHERE ? @@ r.name OR '#{qstring}' @@ r.guide OR '#{qstring}' @@ i.name OR '#{qstring}' @@ c.details", qstring]
     end
 
     page = Integer((params[:commit] ? params[:commit] : '1'))
@@ -70,11 +72,25 @@ class RecipesController < ApplicationController
     @pagecount = all_recipes.to_a.length / 9 + 1
   end
 
+  def browse_new
+    unless ($redis.get 'omniselect_valid') == 'true'
+      $redis.multi do
+        $redis.set 'omniselect_valid', true, {ex: 300}
+        omniselect = execute_sql 'SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality, avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime, json_agg(i.name) as namearray, json_agg(c.amount) as amountarray, json_agg(c.details) as detailsarray FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id LEFT JOIN recipe_ratings rr ON r.id = rr.recipe_id
+                  GROUP BY r.id, r.name, r.guide'
+        omniselect.each do |row|
+          $redis.zadd 'omniselect', row[:avgquality], row.to_json
+          $redis.zadd 'idToQuality', row[:id], row[:avgquality]
+        end
+      end
+    end
+  end
+
   def show
     select = Recipe.find_by_sql "SELECT r.name as rname, r.*, i.name as iname,r.user_id, c.details, c.amount FROM recipes r
                                   LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id WHERE r.id = #{params[:id]}"
 
-    recipe_rating = (Recipe.find_by_sql "SELECT avg(quality),avg(difficulty),avg(time) FROM recipes r JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{params[:id]}")[0]
+    recipe_rating = (Recipe.find_by_sql "SELECT avg(quality) as quality,avg(difficulty) as difficulty,avg(time) as time FROM recipes r JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{params[:id]}")[0]
     @quality = recipe_rating[:quality].nil? ? 'not yet rated' : recipe_rating[:quality]
     @difficulty = recipe_rating[:difficulty].nil? ? 'not yet rated' : recipe_rating[:difficulty]
     @time = recipe_rating[:time].nil? ? 'not yet rated' : recipe_rating[:time]
@@ -131,6 +147,7 @@ class RecipesController < ApplicationController
       return
     end
 
+    $redis.del 'omniselect_valid'
     ActiveRecord::Base.connection.transaction do
       execute_sql "INSERT INTO recipes (name,guide,created_at,updated_at,user_id)
                  values ('#{params[:recipe][:name]}','#{params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
@@ -151,6 +168,14 @@ class RecipesController < ApplicationController
   end
 
   def suggest
+    @itemlist = (Ingredient.find_by_sql 'SELECT * FROM ingredients LIMIT 4').to_a[0..4]
+    @thumbtype = :ingredient
+    @squaresize = 2
+    maxid = 0
+    @itemlist.each do |i|
+      maxid = i[:id] if i[:id] > maxid
+    end
+    @maxid = maxid
   end
 
   def rate
@@ -160,6 +185,8 @@ class RecipesController < ApplicationController
   end
 
   def createrating
+    execute_sql "INSERT INTO recipe_ratings (recipe_id,quality,difficulty,time,created_at,updated_at)
+                 values (#{params[:id]},#{params[:rating][:quality]},#{params[:rating][:difficulty]},#{params[:rating][:time]},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
     redirect_to '/recipes/recipes_to_try'
   end
 
@@ -181,6 +208,15 @@ class RecipesController < ApplicationController
 
     redirect_to '/recipes/my_recipes'
 
+  end
+
+  def getnext
+    @recipe = (Ingredient.find_by_sql "SELECT * FROM ingredients WHERE id > #{params[:maxid]} ORDER BY id ASC LIMIT 1")[0]
+    if @recipe == nil
+      render nothing: true
+      return
+    end
+    render layout: false
   end
 
 end

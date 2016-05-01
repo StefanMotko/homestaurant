@@ -1,6 +1,7 @@
 <div class="col-md-offset-1 col-md-10 thumb-item-display">
 
-  <% @itemlist.each_slice(3) do |slice| %>
-    <%= render partial: 'partials/thumbnail_row',locals: {slice: slice, thumbtype: @thumbtype} %>
+  <% @squaresize = 3 if @squaresize.nil? %>
+  <% @itemlist.each_slice(@squaresize) do |slice| %>
+    <%= render partial: 'partials/thumbnail_row',locals: {slice: slice, thumbtype: @thumbtype, squaresize: @squaresize} %>
   <% end unless @itemlist.nil? %>
 </div>
