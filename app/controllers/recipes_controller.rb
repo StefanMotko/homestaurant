@@ -44,7 +44,6 @@ class RecipesController < ApplicationController
   end
 
   def browse
-    browse_new if ENV['RAILS_ENV'] == 'development'
 
     @pagecount = 0
     if params[:query].nil?
@@ -72,19 +71,19 @@ class RecipesController < ApplicationController
     @pagecount = all_recipes.to_a.length / 9 + 1
   end
 
-  def browse_new
-    unless ($redis.get 'omniselect_valid') == 'true'
-      $redis.multi do
-        $redis.set 'omniselect_valid', true, {ex: 300}
-        omniselect = execute_sql 'SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality, avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime, json_agg(i.name) as namearray, json_agg(c.amount) as amountarray, json_agg(c.details) as detailsarray FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id LEFT JOIN recipe_ratings rr ON r.id = rr.recipe_id
-                  GROUP BY r.id, r.name, r.guide'
-        omniselect.each do |row|
-          $redis.zadd 'omniselect', row[:avgquality], row.to_json
-          $redis.zadd 'idToQuality', row[:id], row[:avgquality]
-        end
-      end
-    end
-  end
+  # def redis_cache
+  #   unless ($redis.get 'omniselect_valid') == 'true'
+  #     $redis.multi do
+  #       $redis.set 'omniselect_valid', true, {ex: 300}
+  #       omniselect = execute_sql 'SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality, avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime, json_agg(i.name) as namearray, json_agg(c.amount) as amountarray, json_agg(c.details) as detailsarray FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id LEFT JOIN recipe_ratings rr ON r.id = rr.recipe_id
+  #                 GROUP BY r.id, r.name, r.guide'
+  #       omniselect.each do |row|
+  #         $redis.zadd 'omniselect', row[:avgquality], row.to_json
+  #         $redis.zadd 'idToQuality', row[:id], row[:avgquality]
+  #       end
+  #     end
+  #   end
+  # end
 
   def show
     select = Recipe.find_by_sql "SELECT r.name as rname, r.*, i.name as iname,r.user_id, c.details, c.amount FROM recipes r
@@ -147,7 +146,6 @@ class RecipesController < ApplicationController
       return
     end
 
-    $redis.del 'omniselect_valid'
     ActiveRecord::Base.connection.transaction do
       execute_sql "INSERT INTO recipes (name,guide,created_at,updated_at,user_id)
                  values ('#{params[:recipe][:name]}','#{params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
@@ -165,6 +163,8 @@ class RecipesController < ApplicationController
       end
     end
     redirect_to '/recipes/my_recipes'
+
+    ApplicationController.elastic_reindex
   end
 
   def suggest
@@ -207,6 +207,8 @@ class RecipesController < ApplicationController
     end
 
     redirect_to '/recipes/my_recipes'
+
+    ApplicationController.elastic_reindex
 
   end
 
