@@ -31,6 +31,12 @@ function discard(id, unlike) {
             tempIdElement.remove();
         }
     };
-    request.open("GET","/recipes/getnext?maxid=" + maxid + "&t=" + Math.random(),true);
+
+    var unlikeString = "";
+    if (unlike) {
+        unlikeString="&unlike="+id;
+    }
+
+    request.open("GET","/recipes/getnext?maxid=" + maxid + "&t=" + Math.random() + unlikeString,true);
     request.send();
 }

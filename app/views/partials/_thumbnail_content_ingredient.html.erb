@@ -6,7 +6,7 @@
     <div class="col-md-4">
       <button type="button" class="btn btn-default ingredient-button">I like this</button>
       <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content[:id] %>,false)">Not this time</button>
-      <button type="button" class="btn btn-default ingredient-button">I don't like this</button>
+      <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content[:id] %>,true)">I don't like this</button>
     </div>
   </div>
 

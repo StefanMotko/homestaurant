@@ -44,7 +44,7 @@ class RecipesController < ApplicationController
   end
 
   def browse
-    browse_new
+    browse_new if ENV['RAILS_ENV'] == 'development'
 
     @pagecount = 0
     if params[:query].nil?
