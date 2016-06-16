@@ -71,8 +71,6 @@ class RecipesController < ApplicationController
       }
     end
 
-
-
     page = Integer((params[:commit] ? params[:commit] : '1'))
     rangemin = page * 9 - 9
     rangemax = page * 9 - 1
@@ -163,6 +161,8 @@ class RecipesController < ApplicationController
       return
     end
 
+    recipe = nil
+
     ActiveRecord::Base.connection.transaction do
       execute_sql "INSERT INTO recipes (name,guide,created_at,updated_at,user_id)
                  values ('#{params[:recipe][:name]}','#{params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
@@ -181,10 +181,21 @@ class RecipesController < ApplicationController
     end
     redirect_to '/recipes/my_recipes'
 
-    ApplicationController.elastic_reindex
+    to_elastic = (ActiveRecord::Base.connection.execute "SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality,
+                                                   avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime,
+                                                   json_agg(i.name) as namearray, json_agg(c.amount) as amountarray,
+                                                   json_agg(c.details) as detailsarray FROM recipes r
+                                                   LEFT JOIN components c ON c.recipe_id = r.id
+                                                   LEFT JOIN ingredients i ON i.id = c.ingredient_id
+                                                   LEFT JOIN recipe_ratings rr ON r.id = rr.recipe_id
+                                                   GROUP BY r.id, r.name, r.guide HAVING r.id = #{recipe[0][:id]}")[0]
+
+    $elastic.index index: 'homestaurant', type: 'complexrecipes', id: to_elastic['id'], body: to_elastic
   end
 
   def suggest
+    # suggest by rating
+
     @itemlist = (Ingredient.find_by_sql 'SELECT * FROM ingredients LIMIT 4').to_a[0..4]
     @thumbtype = :ingredient
     @squaresize = 2
@@ -230,6 +241,12 @@ class RecipesController < ApplicationController
   end
 
   def getnext
+    # suggest by rating
+    unless params[:unlike].nil?
+      execute_sql "INSERT INTO ingredient_ratings (user_id,ingredient_id, rating, created_at, updated_at)
+                   values (#{current_user.id},#{params[:unlike]},-5,timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+    end
+
     @recipe = (Ingredient.find_by_sql "SELECT * FROM ingredients WHERE id > #{params[:maxid]} ORDER BY id ASC LIMIT 1")[0]
     if @recipe == nil
       render nothing: true

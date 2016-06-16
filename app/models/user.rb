@@ -14,4 +14,12 @@ class User < ActiveRecord::Base
 
   has_secure_password
   validates :password, presence: true, length: {minimum: 6}
+
+  def set_age(age)
+    @age = age
+  end
+
+  def age
+    @age
+  end
 end

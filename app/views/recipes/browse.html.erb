@@ -1,6 +1,14 @@
 <%= form_for :query, url: recipes_browse_path, method: :get do |f| %>
+
     <%= f.text_field :text, value: @query, placeholder: 'Enter search terms' %>
     <%= f.submit 'Search', class: 'btn btn-default' %>
+
+
+    <div class="row">
+      <%= render 'partials/thumbnails_view' %>
+    </div>
+
+
 
     <div class="row">
       <ul class="pagination">
@@ -9,7 +17,5 @@
         <% end %>
       </ul>
     </div>
-
-    <%= render 'partials/thumbnails_view' %>
 
 <% end %>
