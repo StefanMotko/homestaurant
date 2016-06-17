@@ -194,16 +194,22 @@ class RecipesController < ApplicationController
   end
 
   def suggest
-    # suggest by rating
+    itemlist = (execute_sql "SELECT ss.id, ss.name, CASE WHEN ss.avg IS NULL THEN 0 ELSE ss.avg END
+                                        FROM (SELECT i.id, i.name, avg(ir.rating) FROM ingredients i
+                                        LEFT JOIN ingredient_ratings ir ON ir.ingredient_id = i.id
+                                        WHERE ir.user_id = #{current_user.id} OR ir.user_id IS NULL
+                                        GROUP BY i.name, i.id) ss ORDER BY avg DESC").to_a
 
-    @itemlist = (Ingredient.find_by_sql 'SELECT * FROM ingredients LIMIT 4').to_a[0..4]
+    @synchronizer = (Time.now).to_i
+    @itemlist = itemlist[0..3]
     @thumbtype = :ingredient
     @squaresize = 2
-    maxid = 0
-    @itemlist.each do |i|
-      maxid = i[:id] if i[:id] > maxid
+
+    itemlist[4..-1].each do |item|
+      $redis.rpush "recipesuggest:#{current_user.id}:#{@synchronizer}", item
     end
-    @maxid = maxid
+    $redis.expire "recipesuggest:#{current_user.id}:#{@synchronizer}", 600
+
   end
 
   def rate
@@ -241,13 +247,17 @@ class RecipesController < ApplicationController
   end
 
   def getnext
-    # suggest by rating
+
     unless params[:unlike].nil?
       execute_sql "INSERT INTO ingredient_ratings (user_id,ingredient_id, rating, created_at, updated_at)
                    values (#{current_user.id},#{params[:unlike]},-5,timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
     end
 
-    @recipe = (Ingredient.find_by_sql "SELECT * FROM ingredients WHERE id > #{params[:maxid]} ORDER BY id ASC LIMIT 1")[0]
+    puts params[:synchronizer]
+    redis_incoming = $redis.lpop "recipesuggest:#{current_user.id}:#{params['synchronizer']}"
+    hash = nil
+    hash = eval redis_incoming unless redis_incoming.nil?
+    @recipe = hash
     if @recipe == nil
       render nothing: true
       return

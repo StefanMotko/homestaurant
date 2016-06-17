@@ -6,6 +6,8 @@ gem 'rails', '4.2.5.1'
 
 gem 'elasticsearch'
 
+gem 'redis'
+
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 0.15'
 # Use SCSS for stylesheets

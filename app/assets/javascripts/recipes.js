@@ -14,9 +14,6 @@ $(document).on("click", "#ingredientAddButton",  function(){
 
 function discard(id, unlike) {
 
-    var maxidElement = $("[data-maximum-recipe-id]");
-    var maxid = maxidElement.data("maximumRecipeId");
-
     var request = new XMLHttpRequest();
     request.responseType = "text";
     request.onreadystatechange = function(){
@@ -24,11 +21,6 @@ function discard(id, unlike) {
         {
             var toReplace = $("#ingred" + id)[0];
             toReplace.outerHTML = request.responseText;
-            var tempIdElement = $("[data-temp-id]");
-            var tempId = tempIdElement.data("tempId");
-            console.log(tempId);
-            maxidElement.data("maximumRecipeId",tempId);
-            tempIdElement.remove();
         }
     };
 
@@ -37,6 +29,8 @@ function discard(id, unlike) {
         unlikeString="&unlike="+id;
     }
 
-    request.open("GET","/recipes/getnext?maxid=" + maxid + "&t=" + Math.random() + unlikeString,true);
+    var syncer = $("#synchronizer")[0];
+
+    request.open("GET","/recipes/getnext?t=" + Math.random() + "&synchronizer=" + syncer.innerHTML + unlikeString,true);
     request.send();
 }

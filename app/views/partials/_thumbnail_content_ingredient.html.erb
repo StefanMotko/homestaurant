@@ -1,12 +1,12 @@
-<div class="ingredient-thumb" id="ingred<%= content[:id] %>">
+<div class="ingredient-thumb" id="ingred<%= content['id'] %>">
   <div class="row">
     <div class="col-md-8">
-      <p><%= content[:name] %></p>
+      <p><%= content['name'] %></p>
     </div>
     <div class="col-md-4">
       <button type="button" class="btn btn-default ingredient-button">I like this</button>
-      <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content[:id] %>,false)">Not this time</button>
-      <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content[:id] %>,true)">I don't like this</button>
+      <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content['id'] %>,false)">Not this time</button>
+      <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content['id'] %>,true)">I don't like this</button>
     </div>
   </div>
 
