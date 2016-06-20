@@ -80,14 +80,14 @@ class RecipesController < ApplicationController
                                   LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id WHERE r.id = #{params[:id]}"
 
     recipe_rating = (Recipe.find_by_sql "SELECT avg(quality) as quality,avg(difficulty) as difficulty,avg(time) as time FROM recipes r
-                                         JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{params[:id]}")[0]
+                                         JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{ActiveRecord::Base.sanitize params[:id]}")[0]
 
     flags = (execute_sql "SELECT mrm.user_id as flag_try, fm.user_id as flag_fav FROM recipes r
                                   LEFT JOIN my_recipes_memberships mrm ON mrm.recipe_id = r.id
                                   LEFT JOIN favorites_memberships fm ON fm.recipe_id = r.id
                                   WHERE (mrm.user_id = #{current_user.id} OR mrm.user_id IS NULL)
                                       AND (fm.user_id = #{current_user.id} OR fm.user_id IS NULL)
-                                      AND r.id = #{params[:id]}")
+                                      AND r.id = #{ActiveRecord::Base.sanitize params[:id]}")
 
     @flags = flags[0]
 
@@ -165,7 +165,7 @@ class RecipesController < ApplicationController
 
     ActiveRecord::Base.connection.transaction do
       execute_sql "INSERT INTO recipes (name,guide,created_at,updated_at,user_id)
-                 values ('#{params[:recipe][:name]}','#{params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
+                 values ('#{ActiveRecord::Base.sanitize params[:recipe][:name]}','#{ActiveRecord::Base.sanitize params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
 
       recipe = Recipe.find_by_sql 'SELECT id FROM recipes ORDER BY id desc LIMIT 1'
 
@@ -220,24 +220,24 @@ class RecipesController < ApplicationController
 
   def createrating
     execute_sql "INSERT INTO recipe_ratings (recipe_id,quality,difficulty,time,created_at,updated_at)
-                 values (#{params[:id]},#{params[:rating][:quality]},#{params[:rating][:difficulty]},#{params[:rating][:time]},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+                 values (#{ActiveRecord::Base.sanitize params[:id]},#{ActiveRecord::Base.sanitize params[:rating][:quality]},#{ActiveRecord::Base.sanitize params[:rating][:difficulty]},#{ActiveRecord::Base.sanitize params[:rating][:time]},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
     redirect_to '/recipes/recipes_to_try'
   end
 
   def destroy
-    recipe = (Recipe.find_by_sql "SELECT * FROM recipes WHERE id=#{params[:id]}")[0]
+    recipe = (Recipe.find_by_sql "SELECT * FROM recipes WHERE id=#{ActiveRecord::Base.sanitize params[:id]}")[0]
     unless recipe[:user_id] == current_user[:id]
       redirect_to '/home'
       return
     end
 
     ActiveRecord::Base.connection.transaction do
-      execute_sql "DELETE FROM comments WHERE recipe_id = #{params[:id]}"
-      execute_sql "DELETE FROM components WHERE recipe_id = #{params[:id]}"
-      execute_sql "DELETE FROM recipe_ratings WHERE recipe_id = #{params[:id]}"
-      execute_sql "DELETE FROM my_recipes_memberships WHERE recipe_id = #{params[:id]}"
-      execute_sql "DELETE FROM favorites_memberships WHERE recipe_id = #{params[:id]}"
-      execute_sql "DELETE FROM recipes WHERE id = #{params[:id]}"
+      execute_sql "DELETE FROM comments WHERE recipe_id = #{ActiveRecord::Base.sanitize params[:id]}"
+      execute_sql "DELETE FROM components WHERE recipe_id = #{ActiveRecord::Base.sanitize params[:id]}"
+      execute_sql "DELETE FROM recipe_ratings WHERE recipe_id = #{ActiveRecord::Base.sanitize params[:id]}"
+      execute_sql "DELETE FROM my_recipes_memberships WHERE recipe_id = #{ActiveRecord::Base.sanitize params[:id]}"
+      execute_sql "DELETE FROM favorites_memberships WHERE recipe_id = #{ActiveRecord::Base.sanitize params[:id]}"
+      execute_sql "DELETE FROM recipes WHERE id = #{ActiveRecord::Base.sanitize params[:id]}"
     end
 
     redirect_to '/recipes/my_recipes'

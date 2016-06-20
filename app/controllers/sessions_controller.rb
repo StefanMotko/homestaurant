@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
 
   def create
 
-    users = User.find_by_sql "SELECT * FROM users WHERE email = '#{params[:session][:email]}'"
+    users = User.find_by_sql "SELECT * FROM users WHERE email = '#{ActiveRecord::Base.sanitize params[:session][:email]}'"
     user = users[0]
 
     unless user.nil?
