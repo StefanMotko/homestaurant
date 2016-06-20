@@ -43,6 +43,10 @@ class RecipesController < ApplicationController
       params[:commit] = '1'
     end
 
+    if Recipe.count == 0
+      redirect_to '/home'
+    end
+
     if params[:query][:text] == ''
       search = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
           query: {
@@ -267,6 +271,9 @@ class RecipesController < ApplicationController
 
   def accept
     ingredient = ActiveRecord::Base.sanitize params[:ingredient]
+    if Recipe.count == 0
+      redirect_to '/home'
+    end
     recipelist = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
 
         sort: [
