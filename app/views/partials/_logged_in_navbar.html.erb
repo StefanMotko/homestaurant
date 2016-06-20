@@ -1,18 +1,18 @@
 <nav>
 
-  <div class="row text-center"><%= current_user[:username] %></div>
+  <div class="row text-center thumbnail" style="width: 250px; margin-left: 30px"><%= current_user[:username] %></div>
   <br>
-  <div class="row text-center"><%= link_to 'Recipes to try', '/recipes/recipes_to_try' %></div>
-  <div class="row text-center"><%= link_to 'My recipes', '/recipes/my_recipes' %></div>
-  <div class="row text-center"><%= link_to 'Browse', '/recipes/browse' %></div>
+  <div class="row text-center"><%= link_to 'Recipes to try', '/recipes/recipes_to_try', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'My recipes', '/recipes/my_recipes', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'Browse', '/recipes/browse', class: 'navlink' %></div>
   <br>
-  <div class="row text-center"><%= link_to 'Add recipe', '/recipes/new' %></div>
-  <div class="row text-center"><%= link_to 'Suggest recipe', '/recipes/suggest' %></div>
+  <div class="row text-center"><%= link_to 'Add recipe', '/recipes/new', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'Suggest recipe', '/recipes/suggest', class: 'navlink' %></div>
   <br>
-  <div class="row text-center"><%= link_to 'Home', '/' %></div>
-  <div class="row text-center"><%= link_to 'About', '/about' %></div>
+  <div class="row text-center"><%= link_to 'Home', '/', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'About', '/about', class: 'navlink' %></div>
   <br>
-  <div class="row text-center"><%= link_to 'Change password', '/users/edit' %></div>
-  <div class="row text-center"><%= link_to 'Log out', '/logout', method: :delete %></div>
+  <div class="row text-center"><%= link_to 'Change password', '/users/edit', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'Log out', '/logout', method: :delete, class: 'navlink' %></div>
 
 </nav>

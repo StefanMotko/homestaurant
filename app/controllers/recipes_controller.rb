@@ -86,20 +86,6 @@ class RecipesController < ApplicationController
     @pagecount = all_recipes.length / 9 + 1
   end
 
-  # def redis_cache
-  #   unless ($redis.get 'omniselect_valid') == 'true'
-  #     $redis.multi do
-  #       $redis.set 'omniselect_valid', true, {ex: 300}
-  #       omniselect = execute_sql 'SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality, avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime, json_agg(i.name) as namearray, json_agg(c.amount) as amountarray, json_agg(c.details) as detailsarray FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id LEFT JOIN recipe_ratings rr ON r.id = rr.recipe_id
-  #                 GROUP BY r.id, r.name, r.guide'
-  #       omniselect.each do |row|
-  #         $redis.zadd 'omniselect', row[:avgquality], row.to_json
-  #         $redis.zadd 'idToQuality', row[:id], row[:avgquality]
-  #       end
-  #     end
-  #   end
-  # end
-
   def show
     select = Recipe.find_by_sql "SELECT r.name as rname, r.*, i.name as iname,r.user_id, c.details, c.amount FROM recipes r
                                   LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id WHERE r.id = #{params[:id]}"
@@ -113,6 +99,20 @@ class RecipesController < ApplicationController
     select.each do |component|
       @ingredientlist.push({name: component[:iname], details: component[:details], amount: component[:amount]})
     end
+
+    @suggested = (params[:suggested] == 'true')
+    if @suggested
+      if params[:nextid] == 'nil'
+        @nextid = $redis.rpop "suggestionlist:#{current_user.id}"
+      else
+        @nextid = params[:nextid]
+      end
+    end
+
+    @commentlist = Comment.find_by_sql "SELECT u.username as poster, c.content FROM comments c
+                    JOIN users u ON c.user_id = u.id
+                    WHERE c.recipe_id = #{@recipe[:id]}"
+    puts @commentlist
   end
 
   def recipes_to_try
@@ -181,8 +181,8 @@ class RecipesController < ApplicationController
     end
     redirect_to '/recipes/my_recipes'
 
-    to_elastic = (ActiveRecord::Base.connection.execute "SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality,
-                                                   avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime,
+    to_elastic = (ActiveRecord::Base.connection.execute "SELECT r.id, r.name, r.guide, coalesce(avg(rr.quality),5) as avgquality,
+                                                   coalesce(avg(rr.difficulty),5) as avgdifficulty, coalesce(avg(rr.time),5) as avgtime,
                                                    json_agg(i.name) as namearray, json_agg(c.amount) as amountarray,
                                                    json_agg(c.details) as detailsarray FROM recipes r
                                                    LEFT JOIN components c ON c.recipe_id = r.id
@@ -195,7 +195,7 @@ class RecipesController < ApplicationController
 
   def suggest
     itemlist = (execute_sql "SELECT ss.id, ss.name, CASE WHEN ss.avg IS NULL THEN 0 ELSE ss.avg END
-                                        FROM (SELECT i.id, i.name, avg(ir.rating) FROM ingredients i
+                                        FROM (SELECT i.id, i.name, sum(ir.rating) as avg FROM ingredients i
                                         LEFT JOIN ingredient_ratings ir ON ir.ingredient_id = i.id
                                         WHERE ir.user_id = #{current_user.id} OR ir.user_id IS NULL
                                         GROUP BY i.name, i.id) ss ORDER BY avg DESC").to_a
@@ -263,6 +263,32 @@ class RecipesController < ApplicationController
       return
     end
     render layout: false
+  end
+
+  def accept
+    ingredient = ActiveRecord::Base.sanitize params[:ingredient]
+    recipelist = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
+
+        sort: [
+            avgquality: 'desc'
+        ],
+        query: {
+            match: {
+                namearray: ingredient
+            }
+        }
+    }
+
+    $redis.del "suggestionlist:#{current_user.id}"
+
+    recipelist['hits']['hits'].each do |item|
+      $redis.lpush "suggestionlist:#{current_user.id}", item['_source']['id']
+    end
+
+    recipe_id = $redis.rpop "suggestionlist:#{current_user.id}"
+    next_id = $redis.rpop "suggestionlist:#{current_user.id}"
+
+    redirect_to "/recipes/#{recipe_id}?suggested=true&nextid=#{next_id}"
   end
 
 end

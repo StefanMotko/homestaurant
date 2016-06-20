@@ -35,8 +35,8 @@ class ApplicationController < ActionController::Base
   end
 
   def self.elastic_reindex
-    selection = ActiveRecord::Base.connection.execute 'SELECT r.id, r.name, r.guide, avg(rr.quality) as avgquality,
-                                                   avg(rr.difficulty) as avgdifficulty, avg(rr.time) as avgtime,
+    selection = ActiveRecord::Base.connection.execute 'SELECT r.id, r.name, r.guide, coalesce(avg(rr.quality),5) as avgquality,
+                                                   coalesce(avg(rr.difficulty),5) as avgdifficulty, coalesce(avg(rr.time),5) as avgtime,
                                                    json_agg(i.name) as namearray, json_agg(c.amount) as amountarray,
                                                    json_agg(c.details) as detailsarray FROM recipes r
                                                    LEFT JOIN components c ON c.recipe_id = r.id

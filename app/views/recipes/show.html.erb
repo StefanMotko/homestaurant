@@ -1,41 +1,92 @@
-<div class="col-md-6">
-  <div class="row">
+<%= render partial: 'partials/recipesuggest_actionbar', locals: {nextid: @nextid} if @suggested %>
+<div style="margin-top: 40px">
+  <div class="col-md-6">
 
-    <div class="col-md-2">
-      <label>Recipe name:</label>
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Recipe name:</label>
+      </div>
+
+      <div class="col-md-9">
+        <%= @recipe[:rname] %>
+      </div>
+
     </div>
 
-    <div class="col-md-10">
-      <%= @recipe[:rname] %>
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Quality:</label>
+      </div>
+
+      <div class="col-md-9">
+        <%= @quality %>
+      </div>
+
     </div>
+
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Difficulty:</label>
+      </div>
+
+      <div class="col-md-9">
+        <%= @difficulty %>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Preparation time:</label>
+      </div>
+
+      <div class="col-md-9">
+        <%= @time %>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-3">
+        <label>Textual guide:</label>
+      </div>
+
+      <div class="col-md-9">
+        <%= @recipe[:guide] %>
+      </div>
+
+    </div>
+
+
+    <div class="row"><%= link_to 'Rate', "/recipes/#{@recipe[:id]}/rate" %></div>
+    <div class="row"><%= link_to 'Delete', "/recipes/#{@recipe[:id]}/destroy", method: :delete if current_user[:id] == @recipe[:user_id] %></div>
+  </div>
+  <div class="col-md-6">
+
+    <% @ingredientlist.each do |ingredient| %>
+        <%= render partial: 'partials/ingredient', locals: {name: ingredient[:name], details: ingredient[:details], amount: ingredient[:amount]} %>
+    <% end %>
 
   </div>
 
-  <div class="row">
-
-    <div class="col-md-2">
-      <label>Textual guide:</label>
+  <div class="row col-md-offset-1">
+    <h1>
+      Comments
+    </h1>
+    <div style="margin-bottom: 30px">
+      <%= form_for :comment, url: '/comments/create' do |f| %>
+        <%= f.text_area :content, default: 'Post a comment...', style: 'min-height: 60px;min-width:600px;' %><br>
+        <%= f.submit 'Post comment', class: 'btn btn-default' %>
+        <%= f.hidden_field :recipe_id, value: @recipe[:id] %>
+      <% end %>
     </div>
-
-    <div class="col-md-10">
-      <%= @recipe[:guide] %>
-    </div>
-
+    <% @commentlist.each do |comment| %>
+        <%= render partial: 'partials/comment', locals: {poster: comment[:poster], content: comment[:content]} %>
+    <% end %>
   </div>
-
-  <div class="row">Quality: <%= @quality %></div>
-  <div class="row">Difficulty: <%= @difficulty %></div>
-  <div class="row">Preparation time: <%= @time %></div>
-
-
-  <div class="row"><%= link_to 'Rate' , "/recipes/#{@recipe[:id]}/rate" %></div>
-  <div class="row"><%= link_to 'Delete' ,"/recipes/#{@recipe[:id]}/destroy", method: :delete if current_user[:id] == @recipe[:user_id] %></div>
-</div>
-<div class="col-md-6">
-
-  <% @ingredientlist.each do |ingredient| %>
-      <%= render partial: 'partials/ingredient', locals: {name: ingredient[:name], details: ingredient[:details], amount: ingredient[:amount]} %>
-  <% end %>
-
-
 </div>

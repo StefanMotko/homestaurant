@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
 
+  post 'comments/create'
+
   get '/login' => 'sessions#new'
   post '/login' => 'sessions#create'
   delete '/logout' => 'sessions#destroy'
@@ -17,6 +19,7 @@ Rails.application.routes.draw do
   get 'users/edit'
   post 'users/modify'
   delete 'recipes/:id/destroy' => 'recipes#destroy'
+  get 'recipes/accept'
 
   get 'about' => 'static_pages#about'
 
