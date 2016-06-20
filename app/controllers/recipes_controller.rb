@@ -90,7 +90,18 @@ class RecipesController < ApplicationController
     select = Recipe.find_by_sql "SELECT r.name as rname, r.*, i.name as iname,r.user_id, c.details, c.amount FROM recipes r
                                   LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON i.id = c.ingredient_id WHERE r.id = #{params[:id]}"
 
-    recipe_rating = (Recipe.find_by_sql "SELECT avg(quality) as quality,avg(difficulty) as difficulty,avg(time) as time FROM recipes r JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{params[:id]}")[0]
+    recipe_rating = (Recipe.find_by_sql "SELECT avg(quality) as quality,avg(difficulty) as difficulty,avg(time) as time FROM recipes r
+                                         JOIN recipe_ratings rr ON rr.recipe_id = r.id WHERE r.id = #{params[:id]}")[0]
+
+    flags = (execute_sql "SELECT mrm.user_id as flag_try, fm.user_id as flag_fav FROM recipes r
+                                  LEFT JOIN my_recipes_memberships mrm ON mrm.recipe_id = r.id
+                                  LEFT JOIN favorites_memberships fm ON fm.recipe_id = r.id
+                                  WHERE (mrm.user_id = #{current_user.id} OR mrm.user_id IS NULL)
+                                      AND (fm.user_id = #{current_user.id} OR fm.user_id IS NULL)
+                                      AND r.id = #{params[:id]}")
+
+    @flags = flags[0]
+
     @quality = recipe_rating[:quality].nil? ? 'not yet rated' : recipe_rating[:quality]
     @difficulty = recipe_rating[:difficulty].nil? ? 'not yet rated' : recipe_rating[:difficulty]
     @time = recipe_rating[:time].nil? ? 'not yet rated' : recipe_rating[:time]
@@ -100,7 +111,7 @@ class RecipesController < ApplicationController
       @ingredientlist.push({name: component[:iname], details: component[:details], amount: component[:amount]})
     end
 
-    @suggested = (params[:suggested] == 'true')
+    @suggested = (params[:suggested] == 'true') if $redis.exists "suggestionlist:#{current_user.id}"
     if @suggested
       if params[:nextid] == 'nil'
         @nextid = $redis.rpop "suggestionlist:#{current_user.id}"
@@ -111,8 +122,8 @@ class RecipesController < ApplicationController
 
     @commentlist = Comment.find_by_sql "SELECT u.username as poster, c.content FROM comments c
                     JOIN users u ON c.user_id = u.id
-                    WHERE c.recipe_id = #{@recipe[:id]}"
-    puts @commentlist
+                    WHERE c.recipe_id = #{@recipe[:id]}
+                    ORDER BY c.created_at ASC"
   end
 
   def recipes_to_try
@@ -279,6 +290,11 @@ class RecipesController < ApplicationController
         }
     }
 
+    ingredient_id = (execute_sql "SELECT id FROM ingredients WHERE name = #{ingredient}")[0]['id']
+
+    execute_sql "INSERT INTO ingredient_ratings (rating,user_id,ingredient_id,created_at,updated_at)
+                 VALUES (1,#{current_user.id},#{ingredient_id},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+
     $redis.del "suggestionlist:#{current_user.id}"
 
     recipelist['hits']['hits'].each do |item|
@@ -286,7 +302,7 @@ class RecipesController < ApplicationController
     end
 
     recipe_id = $redis.rpop "suggestionlist:#{current_user.id}"
-    next_id = $redis.rpop "suggestionlist:#{current_user.id}"
+    next_id = 'nil'
 
     redirect_to "/recipes/#{recipe_id}?suggested=true&nextid=#{next_id}"
   end

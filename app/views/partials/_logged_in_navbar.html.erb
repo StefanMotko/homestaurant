@@ -1,9 +1,7 @@
 <nav>
-
-  <div class="row text-center thumbnail" style="width: 250px; margin-left: 30px"><%= current_user[:username] %></div>
-  <br>
   <div class="row text-center"><%= link_to 'Recipes to try', '/recipes/recipes_to_try', class: 'navlink' %></div>
-  <div class="row text-center"><%= link_to 'My recipes', '/recipes/my_recipes', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'Recipes by me', '/recipes/my_recipes', class: 'navlink' %></div>
+  <div class="row text-center"><%= link_to 'Favorites', '/recipes/favorites', class: 'navlink' %></div>
   <div class="row text-center"><%= link_to 'Browse', '/recipes/browse', class: 'navlink' %></div>
   <br>
   <div class="row text-center"><%= link_to 'Add recipe', '/recipes/new', class: 'navlink' %></div>

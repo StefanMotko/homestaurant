@@ -1,17 +1,14 @@
 <%= form_for :query, url: request.path, method: :get do |f| %>
 
+    <ul class="pagination" style="margin-left: 30px">
+      <% @pagecount.times do |i| %>
+          <%= render partial: 'partials/paginate_link', locals: {form: f, page: i+1} %>
+      <% end unless @itemlist == [] %>
+    </ul>
+
+
     <div class="row">
       <%= render 'partials/thumbnails_view' %>
-    </div>
-
-
-
-    <div class="row">
-      <ul class="pagination">
-        <% @pagecount.times do |i| %>
-            <%= render partial: 'partials/paginate_link', locals: {form: f, page: i+1} %>
-        <% end %>
-      </ul>
     </div>
 
 <% end %>

@@ -1,32 +1,32 @@
 <%= form_for :useredit, url: '/users/modify' do |f| %>
 
-    <div class="row">
+    <div class="row" style="margin-top: 5px">
       <div class="col-md-2">
         <%= f.label :oldpass, 'Old password' %>
       </div>
-      <div class="col-md-3">
-        <%= f.password_field :oldpass, placeholder: 'Enter your old password' %>
+      <div class="col-md-4">
+        <%= f.password_field :oldpass, placeholder: 'Enter your old password', style: 'width: 250px' %>
       </div>
     </div>
-    <div class="row">
+    <div class="row" style="margin-top: 5px">
       <div class="col-md-2">
         <%= f.label :password, 'New password' %>
       </div>
-      <div class="col-md-3">
-        <%= f.password_field :password, placeholder: 'Enter your new password' %>
+      <div class="col-md-4">
+        <%= f.password_field :password, placeholder: 'Enter your new password', style: 'width: 250px' %>
       </div>
     </div>
-    <div class="row">
+    <div class="row" style="margin-top: 5px">
       <div class="col-md-2">
         <%= f.label :password_confirmation, 'Retype new password' %>
       </div>
-      <div class="col-md-3">
-        <%= f.password_field :password_confirmation, placeholder: 'Enter your new password again' %>
+      <div class="col-md-4">
+        <%= f.password_field :password_confirmation, placeholder: 'Enter your new password again', style: 'width: 250px' %>
       </div>
     </div>
-    <div class="row">
+    <div class="row" style="margin-top: 20px">
       <div class="col-md-2">
-        <%= f.submit 'Change password' %>
+        <%= f.submit 'Change password', class: 'btn btn-default' %>
       </div>
     </div>
 <% end %>
