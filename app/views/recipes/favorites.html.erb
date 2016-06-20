@@ -1,6 +1,6 @@
 <%= form_for :query, url: request.path, method: :get do |f| %>
 
-    <%= render partial: 'partials/norecipes_favorites' if @itemlist == nil %>
+    <%= render partial: 'partials/norecipes_favorites' if @itemlist == [] %>
 
     <ul class="pagination" style="margin-left: 30px">
       <% @pagecount.times do |i| %>

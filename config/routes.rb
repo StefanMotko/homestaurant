@@ -6,6 +6,11 @@ Rails.application.routes.draw do
   post '/login' => 'sessions#create'
   delete '/logout' => 'sessions#destroy'
 
+  get'recipes/:id/add_try' => 'recipes#add_try'
+  get'recipes/:id/remove_try'=> 'recipes#remove_try'
+  get'recipes/:id/add_fav'=> 'recipes#add_fav'
+  get'recipes/:id/remove_fav'=> 'recipes#remove_fav'
+
   get 'recipes/recipes_to_try'
   get 'recipes/my_recipes'
   get 'recipes/favorites'

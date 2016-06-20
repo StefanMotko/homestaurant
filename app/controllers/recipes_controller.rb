@@ -18,28 +18,17 @@ class RecipesController < ApplicationController
 
   def favorites
     @pagecount = 0
-    if params[:query].nil?
+    if current_user.nil?
+      redirect_to '/login'
       return
     end
 
-    if params[:commit] == 'Search'
-      params[:commit] = '1'
-    end
-
-    if params[:query][:text] == ''
-      all_recipes = Recipe.find_by_sql 'SELECT name, id FROM recipes'
-    else
-      qstring = params[:query][:text]
-      all_recipes = Recipe.find_by_sql "SELECT DISTINCT r.id, r.name FROM recipes r LEFT JOIN components c ON c.recipe_id = r.id LEFT JOIN ingredients i ON c.ingredient_id = i.id
-                                        WHERE '#{qstring}' @@ r.name OR '#{qstring}' @@ r.guide OR '#{qstring}' @@ i.name OR '#{qstring}' @@ c.details"
-    end
-
+    all_recipes = Recipe.find_by_sql "SELECT r.name,r.id FROM recipes r JOIN favorites_memberships fm ON fm.recipe_id = r.id WHERE fm.user_id = #{current_user[:id]}"
     page = Integer((params[:commit] ? params[:commit] : '1'))
     rangemin = page * 9 - 9
     rangemax = page * 9 - 1
     @itemlist = all_recipes[rangemin .. rangemax]
     @thumbtype = :recipe
-    @query = params[:query][:text]
     @pagecount = all_recipes.to_a.length / 9 + 1
   end
 
@@ -305,6 +294,40 @@ class RecipesController < ApplicationController
     next_id = 'nil'
 
     redirect_to "/recipes/#{recipe_id}?suggested=true&nextid=#{next_id}"
+  end
+
+  def add_try
+    recipe_id = ActiveRecord::Base.sanitize params[:id]
+
+    execute_sql "INSERT INTO my_recipes_memberships (recipe_id,user_id,created_at,updated_at)
+                 VALUES (#{recipe_id},#{current_user.id},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+
+    redirect_to "/recipes/#{recipe_id}"
+  end
+
+  def add_fav
+    recipe_id = ActiveRecord::Base.sanitize params[:id]
+
+    execute_sql "INSERT INTO favorites_memberships (recipe_id,user_id,created_at,updated_at)
+                 VALUES (#{recipe_id},#{current_user.id},timestamptz '#{Time.now}',timestamptz '#{Time.now}')"
+
+    redirect_to "/recipes/#{recipe_id}"
+  end
+
+  def remove_try
+    recipe_id = ActiveRecord::Base.sanitize params[:id]
+
+    execute_sql "DELETE FROM my_recipes_memberships WHERE user_id = #{current_user.id} AND recipe_id = #{recipe_id}"
+
+    redirect_to "/recipes/#{recipe_id}"
+  end
+
+  def remove_fav
+    recipe_id = ActiveRecord::Base.sanitize params[:id]
+
+    execute_sql "DELETE FROM favorites_memberships WHERE user_id = #{current_user.id} AND recipe_id = #{recipe_id}"
+
+    redirect_to "/recipes/#{recipe_id}"
   end
 
 end

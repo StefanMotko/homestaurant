@@ -1,10 +1,10 @@
 <div class="row" style="margin: 10px">
-  <% unless @flags[:flag_try] %>
+  <% if @flags['flag_try'] == nil %>
       <%= link_to 'Add to Recipes to try', "/recipes/#{@recipe[:id]}/add_try", class: 'btn btn-primary' %>
   <% else %>
-  <%= link_to 'Remove from Recipes to try', "/recipes/#{@recipe[:id]}/remove_try", class: 'btn btn-primary' %>
-      <% end %>
-  <% unless @flags[:flag_try] %>
+      <%= link_to 'Remove from Recipes to try', "/recipes/#{@recipe[:id]}/remove_try", class: 'btn btn-primary' %>
+  <% end %>
+  <% if @flags['flag_fav'] == nil %>
       <%= link_to 'Add to Favorites', "/recipes/#{@recipe[:id]}/add_fav", class: 'btn btn-primary' %>
   <% else %>
       <%= link_to 'Remove from Favorites', "/recipes/#{@recipe[:id]}/remove_fav", class: 'btn btn-primary' %>
