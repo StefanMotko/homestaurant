@@ -170,7 +170,7 @@ class RecipesController < ApplicationController
 
     ActiveRecord::Base.connection.transaction do
       execute_sql "INSERT INTO recipes (name,guide,created_at,updated_at,user_id)
-                 values ('#{ActiveRecord::Base.sanitize params[:recipe][:name]}','#{ActiveRecord::Base.sanitize params[:recipe][:guide]}',timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
+                 values (#{ActiveRecord::Base.sanitize params[:recipe][:name]},#{ActiveRecord::Base.sanitize params[:recipe][:guide]},timestamptz '#{Time.now}',timestamptz '#{Time.now}','#{current_user[:id]}')"
 
       recipe = Recipe.find_by_sql 'SELECT id FROM recipes ORDER BY id desc LIMIT 1'
 
