@@ -4,7 +4,8 @@
       <p><%= content['name'] %></p>
     </div>
     <div class="col-md-4">
-      <a href="\recipes\accept?ingredient=<%= content['name'] %>" class="btn btn-default ingredient-button">I like this</a>
+      <a href="\recipes\accept?ingredient=<%= content['name'] %>" class="btn btn-default ingredient-button"
+         onclick="ga('send', 'event', 'recipe', 'accept');">I like this</a>
       <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content['id'] %>,false)">Not this time</button>
       <button type="button" class="btn btn-default ingredient-button" onclick="discard(<%= content['id'] %>,true)">I don't like this</button>
     </div>
