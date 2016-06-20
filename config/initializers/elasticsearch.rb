@@ -6,6 +6,3 @@ if Rails.env.production?
 else
   $elastic = Elasticsearch::Client.new log: true
 end
-
-
-ApplicationController.elastic_reindex
