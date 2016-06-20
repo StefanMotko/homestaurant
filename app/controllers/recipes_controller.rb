@@ -45,6 +45,7 @@ class RecipesController < ApplicationController
 
     if Recipe.count == 0
       redirect_to '/'
+      return
     end
 
     if params[:query][:text] == ''
@@ -273,6 +274,7 @@ class RecipesController < ApplicationController
     ingredient = ActiveRecord::Base.sanitize params[:ingredient]
     if Recipe.count == 0
       redirect_to '/'
+      return
     end
     recipelist = $elastic.search index: 'homestaurant', type: 'complexrecipes', body: {
 
